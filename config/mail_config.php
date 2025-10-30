@@ -10,18 +10,17 @@ function sendActivationEmail($email, $activation_link) {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = $_ENV['MAIL_USERNAME'];
-        $mail->Password = $_ENV['MAIL_PASSWORD'];
+        $mail->Username = 'restagevira4@gmail.com';
+        $mail->Password = 'wiyl rfrn frnm eije'; // App Password
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
 
-        $mail->setFrom($_ENV['MAIL_USERNAME'], 'Sistem Gudang');
+        $mail->setFrom('restagevira4@gmail.com', 'Sistem Gudang');
         $mail->addAddress($email);
 
         $mail->isHTML(true);
         $mail->Subject = 'Aktivasi Akun Anda';
-        $mail->Body    = "Halo, klik link berikut untuk aktivasi akun Anda:<br>
-                         <a href='$activation_link'>$activation_link</a>";
+        $mail->Body    = "Klik link berikut untuk aktivasi:<br><a href='$activation_link'>$activation_link</a>";
 
         $mail->send();
         return true;
@@ -37,19 +36,17 @@ function sendResetPasswordEmail($email, $nama, $reset_link) {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = $_ENV['MAIL_USERNAME'];
-        $mail->Password = $_ENV['MAIL_PASSWORD'];
+        $mail->Username = 'restagevira4@gmail.com';
+        $mail->Password = 'wiyl rfrn frnm eije';
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
 
-        $mail->setFrom($_ENV['MAIL_USERNAME'], 'Sistem Gudang');
+        $mail->setFrom('restagevira4@gmail.com', 'Sistem Gudang');
         $mail->addAddress($email, $nama);
 
         $mail->isHTML(true);
         $mail->Subject = 'Reset Password Anda';
-        $mail->Body    = "Halo $nama,<br> Klik link berikut untuk mereset password Anda:<br>
-                          <a href='$reset_link'>$reset_link</a><br>
-                          Link ini berlaku 1 jam.";
+        $mail->Body    = "Halo $nama,<br>Klik link berikut untuk reset password:<br><a href='$reset_link'>$reset_link</a><br>Link berlaku 1 jam.";
 
         $mail->send();
         return true;
@@ -58,4 +55,3 @@ function sendResetPasswordEmail($email, $nama, $reset_link) {
         return false;
     }
 }
-?>

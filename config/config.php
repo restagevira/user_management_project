@@ -1,25 +1,23 @@
 <?php
-// -----------------------------
-// CONFIGURATION FILE SEDERHANA
-// -----------------------------
+date_default_timezone_set('Asia/Jakarta');
+session_start();
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+define('BASE_URL', 'http://localhost/user_management');
 
-// Base URL
-define('BASE_URL', 'http://localhost/user_management/public');
+$host = 'localhost';
+$db   = 'user_management_db';
+$user = 'root';
+$pass = '';
+$charset = 'utf8mb4';
 
-// Database
-$db_host = '127.0.0.1';
-$db_name = 'user_management_db';
-$db_user = 'root';
-$db_pass = '';
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+];
 
 try {
-    $pdo = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8mb4", $db_user, $db_pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("❌ Gagal terhubung ke database: " . $e->getMessage());
+    $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (\PDOException $e) {
+    die('Koneksi gagal: '.$e->getMessage());
 }
-?>

@@ -7,7 +7,7 @@ $showForm = false;
 if (isset($_GET['token'])) {
     $token = $_GET['token'];
 
-    // cek token valid dan belum kadaluarsa
+    // Cek token dan waktu kadaluarsa
     $stmt = $pdo->prepare("
         SELECT pr.user_id, u.nama 
         FROM password_resets pr 
@@ -22,17 +22,20 @@ if (isset($_GET['token'])) {
         $user_id = $data['user_id'];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $new_password = $_POST['new_password'];
-            $confirm_password = $_POST['confirm_password'];
+            $new_password = trim($_POST['new_password']);
+            $confirm_password = trim($_POST['confirm_password']);
 
             if ($new_password !== $confirm_password) {
-                $message = "⚠️ Password baru dan konfirmasi tidak cocok!";
+                $message = "❌ Password baru dan konfirmasi tidak cocok!";
+            } elseif (strlen($new_password) < 6) {
+                $message = "⚠️ Password minimal 6 karakter!";
             } else {
+                // Update password
                 $hashed = password_hash($new_password, PASSWORD_DEFAULT);
-                $update = $pdo->prepare("UPDATE users SET password=? WHERE id=?");
-                $update->execute([$hashed, $user_id]);
+                $stmtUpdate = $pdo->prepare("UPDATE users SET password=? WHERE id=?");
+                $stmtUpdate->execute([$hashed, $user_id]);
 
-                // hapus token setelah digunakan
+                // Hapus token setelah digunakan
                 $pdo->prepare("DELETE FROM password_resets WHERE user_id=?")->execute([$user_id]);
 
                 $message = "✅ Password berhasil diperbarui! <a href='../public/login.php'>Login sekarang</a>";
@@ -40,10 +43,10 @@ if (isset($_GET['token'])) {
             }
         }
     } else {
-        $message = "⚠️ Token tidak valid atau sudah kadaluarsa!";
+        $message = "❌ Token tidak valid atau sudah kadaluarsa!";
     }
 } else {
-    $message = "⚠️ Token tidak ditemukan!";
+    $message = "❌ Token tidak ditemukan!";
 }
 ?>
 
@@ -54,18 +57,20 @@ if (isset($_GET['token'])) {
     <title>Reset Password</title>
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
-<body style="background: linear-gradient(135deg, #7b4397, #dc2430); display:flex; justify-content:center; align-items:center; height:100vh;">
+<body>
 <div class="form-container">
     <h2>Reset Password</h2>
     <?php if($message) echo "<p class='message'>{$message}</p>"; ?>
     <?php if($showForm): ?>
     <form method="POST">
-        <input type="password" name="new_password" placeholder="Password Baru" required>
-        <input type="password" name="confirm_password" placeholder="Konfirmasi Password Baru" required>
+        <label>Password Baru:</label>
+        <input type="password" name="new_password" required>
+        <label>Konfirmasi Password Baru:</label>
+        <input type="password" name="confirm_password" required>
         <button type="submit">Reset Password</button>
     </form>
     <?php endif; ?>
-    <p class="bottom-text"><a href="login.php">← Kembali ke Login</a></p>
+    <p class="bottom-text"><a href="../public/login.php">← Kembali ke Login</a></p>
 </div>
 </body>
 </html>
