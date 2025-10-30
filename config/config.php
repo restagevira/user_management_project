@@ -1,18 +1,24 @@
 <?php
-date_default_timezone_set('Asia/Jakarta'); // sesuai timezone lokal
 // -----------------------------
 // CONFIGURATION FILE
 // -----------------------------
 
-// Aktifkan session untuk seluruh sistem
+require __DIR__ . '/../vendor/autoload.php';
+
+use Dotenv\Dotenv;
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Base URL untuk project
-define('BASE_URL', 'http://localhost/user_management');
+// Load file .env
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 
-// Konfigurasi koneksi database
+// Base URL
+define('BASE_URL', $_ENV['BASE_URL'] ?? 'http://localhost/user_management/public');
+
+// Database
 $db_host = '127.0.0.1';
 $db_name = 'user_management_db';
 $db_user = 'root';
