@@ -1,22 +1,14 @@
 <?php
 // -----------------------------
-// CONFIGURATION FILE
+// CONFIGURATION FILE SEDERHANA
 // -----------------------------
-
-require __DIR__ . '/../vendor/autoload.php';
-
-use Dotenv\Dotenv;
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Load file .env
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
-
 // Base URL
-define('BASE_URL', $_ENV['BASE_URL'] ?? 'http://localhost/user_management/public');
+define('BASE_URL', 'http://localhost/user_management/public');
 
 // Database
 $db_host = '127.0.0.1';
