@@ -7,38 +7,37 @@ $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
 
-    // Cek email ada di database
+    // Cek email di database
     $stmt = $pdo->prepare("SELECT id, nama FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
-        // Hapus token lama jika ada
+        // Hapus token lama
         $pdo->prepare("DELETE FROM password_resets WHERE user_id = ?")->execute([$user['id']]);
 
-        // Buat token unik untuk reset password
+        // Buat token baru
         $token = bin2hex(random_bytes(50));
         $expires = date('Y-m-d H:i:s', strtotime('+1 hour')); // berlaku 1 jam
 
-        // Simpan token ke database
+        // Simpan token
         $stmtToken = $pdo->prepare("INSERT INTO password_resets (user_id, token, expires_at) VALUES (?, ?, ?)");
         $stmtToken->execute([$user['id'], $token, $expires]);
 
-        // Buat link reset password
+        // Buat link reset
         $resetLink = BASE_URL . "/auth/reset_password.php?token=" . urlencode($token);
 
         // Kirim email
         if (sendResetPasswordEmail($email, $user['nama'], $resetLink)) {
-            $message = "✅ Tautan reset password telah dikirim ke email Anda!";
+            $message = "<p class='message success'>✅ Tautan reset password telah dikirim ke email Anda!</p>";
         } else {
-            $message = "⚠️ Gagal mengirim email. Coba lagi.";
+            $message = "<p class='message error'>⚠️ Gagal mengirim email. Coba lagi.</p>";
         }
     } else {
-        $message = "❌ Email tidak terdaftar!";
+        $message = "<p class='message error'>❌ Email tidak terdaftar!</p>";
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -46,16 +45,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Lupa Password</title>
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
-<body>
+<body style="background: linear-gradient(135deg, #7b4397, #dc2430); display:flex; justify-content:center; align-items:center; height:100vh;">
 <div class="form-container">
-    <h2>Lupa Password</h2>
-    <?php if($message) echo "<p class='message'>{$message}</p>"; ?>
+    <h2>🔑 Lupa Password</h2>
+    <?= $message ?>
     <form method="POST">
-        <label>Email Terdaftar:</label>
-        <input type="email" name="email" required>
+        <input type="email" name="email" placeholder="Masukkan email terdaftar" required>
         <button type="submit">Kirim Tautan Reset</button>
     </form>
-    <p class="bottom-text"><a href="../public/login.php">← Kembali ke Login</a></p>
+    <div class="bottom-text">
+        <p><a href="../public/login.php">← Kembali ke Login</a></p>
+    </div>
 </div>
 </body>
 </html>
